@@ -7,6 +7,7 @@ import logging
 import os
 import pickle
 import time
+import matplotlib.pyplot as plt
 
 import numpy as np
 import optimizers
@@ -41,7 +42,7 @@ def train(args):
                                 logging.StreamHandler()
                             ])
 
-    logging.info(f'Using: {args.device}')
+    logging.info(f"Using: {args.device}")
     logging.info("Using seed {}.".format(args.seed))
 
     # Load data
@@ -126,6 +127,20 @@ def train(args):
                 if counter == args.patience and epoch > args.min_epochs:
                     logging.info("Early stopping")
                     break
+    print(best_emb)
+    from manifolds.hyperboloid import Hyperboloid
+    best_emb2=Hyperboloid.to_poincare(Hyperboloid,best_emb,10)
+    print(best_emb2)
+    poincare_embedding=best_emb2.detach().cpu().numpy()
+    plt.scatter(poincare_embedding[:, 0], poincare_embedding[:, 1])
+    plt.savefig("hyperbolic.jpg")
+
+    #best_emb2=best_emb.detach().cpu().numpy()
+    #plt.scatter(best_emb2[:, 0], best_emb2[:, 1])
+    #plt.savefig("hyperbolic.jpg")
+
+
+
 
     logging.info("Optimization Finished!")
     logging.info("Total time elapsed: {:.4f}s".format(time.time() - t_total))
@@ -145,7 +160,10 @@ def train(args):
         json.dump(vars(args), open(os.path.join(save_dir, 'config.json'), 'w'))
         torch.save(model.state_dict(), os.path.join(save_dir, 'model.pth'))
         logging.info(f"Saved model in {save_dir}")
+    
 
 if __name__ == '__main__':
     args = parser.parse_args()
     train(args)
+
+

@@ -16,7 +16,7 @@ class PoincareBall(Manifold):
 
     """
 
-    def __init__(self, ):
+    def __init__(self, **kwarg):
         super(PoincareBall, self).__init__()
         self.name = 'PoincareBall'
         self.min_norm = 1e-15
